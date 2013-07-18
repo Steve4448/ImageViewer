@@ -57,7 +57,7 @@ QLayoutItem * ImageGridLayout::itemAt ( int ) const {
 }
 
 QSize ImageGridLayout::maximumSize () const {
-	return QSize(x + 100 + GAP, y + GAP);
+	return QSize(x + DEFAULT_SIZE_X + GAP, y + GAP);
 }
 
 int	ImageGridLayout::minimumHeightForWidth ( int ) const {
@@ -65,11 +65,11 @@ int	ImageGridLayout::minimumHeightForWidth ( int ) const {
 }
 
 QSize ImageGridLayout::minimumSize () const {
-	return QSize(x + 100 + GAP, y + GAP);
+	return QSize(x + DEFAULT_SIZE_X + GAP, y + GAP);
 }
 
 QSize ImageGridLayout::sizeHint() const {
-	return QSize(x + 100 + GAP, y + GAP);
+	return QSize(x + DEFAULT_SIZE_X + GAP, y + GAP);
 }
 
 QLayoutItem * ImageGridLayout::takeAt ( int ) {

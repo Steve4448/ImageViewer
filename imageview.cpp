@@ -9,7 +9,7 @@ ImageView::ImageView(QNetworkReply* data, QWidget *parent) : QWidget(parent) {
 	frameTimer.setSingleShot(true);
 	errored = false;
 	drawHuge = false;
-	setMinimumSize(100, 100);
+	setMinimumSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 	data->setParent(this);
     _width = width();
     _height = height();
@@ -28,7 +28,7 @@ void ImageView::recievedData() {
 		frame->pixelsNom = QPixmap::fromImageReader(&imageReader);
 		if(frame->pixelsNom.size() == QSize(0, 0))
 			goto errorcleanup;
-		frame->thumbnail = frame->pixelsNom.scaled(QSize(100, 100), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		frame->thumbnail = frame->pixelsNom.scaled(QSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		if(frame->thumbnail.size() == QSize(0, 0))
 			goto errorcleanup;
 		frame->frameDelay = imageReader.nextImageDelay();
@@ -88,13 +88,12 @@ void ImageView::progress(qint64 cur, qint64 tot) {
 void ImageView::mouseReleaseEvent(QMouseEvent*) {
 	if(!frames.isEmpty() && !drawHuge) {
 		drawHuge = true;
-		_width = frames.at(frameIndex)->pixelsNom.width();
-		_height = frames.at(frameIndex)->pixelsNom.height();
+		resize(frames.at(frameIndex)->pixelsNom.size());
 	} else {
 		drawHuge = false;
-		_width = 100;
-		_height = 100;
+		resize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 	}
+	raise();
 	repaint();
 }
 

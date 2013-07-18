@@ -5,6 +5,8 @@
 #include <QNetworkReply>
 #include <QPixmap>
 #include <QTimer>
+#define DEFAULT_SIZE_X 200
+#define DEFAULT_SIZE_Y 200
 
 struct ImageFrame {
 	QPixmap pixelsNom;

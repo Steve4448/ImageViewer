@@ -9,7 +9,7 @@
 ImageViewer::ImageViewer(QWidget *parent) : QMainWindow(parent), ui(new Ui::ImageViewer){
 	gridLayout = new ImageGridLayout;
 	ui->setupUi(this);
-	fetchedData = 0;// initialize your pointers to 0 so it knows they're null
+	fetchedData = 0;
 	connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(fetchImages()));
 	ui->scrollAreaWidgetContents->setLayout(gridLayout);
 }
@@ -34,13 +34,12 @@ void ImageViewer::fetchImages() {
 }
 
 void ImageViewer::finishedFetching() {
-	/*foreach(QObject* qO, ui->scrollAreaWidgetContents->children()) {
+	foreach(QObject* qO, ui->scrollAreaWidgetContents->children()) {
 		ImageView* view = qobject_cast<ImageView*>(qO);
 		if(!view)
 			continue;
-		gridLayout->removeWidget(view);
-		//view->deleteLater();
-	}*/
+		view->deleteLater();
+	}
 
 	if(fetchedData->error()){
 		QMessageBox::warning(this, "Error", "Unable to recieve data from URL.");
@@ -63,9 +62,9 @@ void ImageViewer::finishedFetching() {
 			for(int i = 0; i < parts.length(); i++){
 				QString part = parts[i];
 				if(foundSrc){
+					qDebug() << part;
 					if(part.startsWith('"') || part.startsWith('\''))
 						part = part.mid(1, part.length()-2);
-
 					QUrl imageURL;
 					if(part.startsWith('/')) { // path relative to domain
 						imageURL = fetchedData->url();
@@ -101,5 +100,5 @@ void ImageViewer::finishedFetching() {
 		QMessageBox::warning(this, "Warning", "No image sources found on the provided URL.");
 	}
 	fetchedData->deleteLater();
-	fetchedData = 0; // so it knows its null again
+	fetchedData = 0;
 }

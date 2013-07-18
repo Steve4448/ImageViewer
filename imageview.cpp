@@ -18,11 +18,6 @@ ImageView::ImageView(QNetworkReply* data, QWidget *parent) : QWidget(parent) {
 	connect(data, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(downloadError(QNetworkReply::NetworkError)));
 }
 
-ImageView::~ImageView(){ // cleanup resources
-	foreach(ImageFrame* frame, frames)
-		delete frame;
-}
-
 void ImageView::recievedData() {
 	QImageReader imageReader(imageData);
 	if(imageData->error())
@@ -112,4 +107,9 @@ void ImageView::moveAnimated(int x, int y){
 void ImageView::downloadError(QNetworkReply::NetworkError qNE) {
 	qDebug() << QString("%1 failed to load. Error # %2").arg(imageData->url().toString()).arg(qNE);
 	errored = true;
+}
+
+ImageView::~ImageView(){ // cleanup resources
+	foreach(ImageFrame* frame, frames)
+		delete frame;
 }

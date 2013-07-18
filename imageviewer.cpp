@@ -9,7 +9,7 @@
 ImageViewer::ImageViewer(QWidget *parent) : QMainWindow(parent), ui(new Ui::ImageViewer){
 	gridLayout = new ImageGridLayout;
 	ui->setupUi(this);
-	fetchedData = 0;
+	contentDownloader = 0;
 	connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(fetchImages()));
 	ui->scrollAreaWidgetContents->setLayout(gridLayout);
 }
@@ -20,17 +20,17 @@ ImageViewer::~ImageViewer() {
 
 
 void ImageViewer::fetchImages() {
-	if(fetchedData)
-		fetchedData->deleteLater();
-	if(!ui->lineEdit->text().startsWith("http://") && !ui->lineEdit->text().startsWith("https://")) {
+	if(contentDownloader)
+		contentDownloader->deleteLater();
+
+	if(!ui->lineEdit->text().startsWith("http://") && !ui->lineEdit->text().startsWith("https://"))
 		ui->lineEdit->setText("http://" + ui->lineEdit->text());
-	}
-	fetchedData = accessManager.get(QNetworkRequest(QUrl(ui->lineEdit->text())));
-	if(fetchedData) {
-		connect(fetchedData, SIGNAL(finished()), this, SLOT(finishedFetching()));
-	} else {
+
+	contentDownloader = accessManager.get(QNetworkRequest(QUrl(ui->lineEdit->text())));
+	if(contentDownloader)
+		connect(contentDownloader, SIGNAL(finished()), this, SLOT(finishedFetching()));
+	else
 		QMessageBox::warning(this, "Error", "Malformed URL?");
-	}
 }
 
 void ImageViewer::finishedFetching() {
@@ -41,16 +41,17 @@ void ImageViewer::finishedFetching() {
 		view->deleteLater();
 	}
 
-	if(fetchedData->error()){
+	if(contentDownloader->error()){
 		QMessageBox::warning(this, "Error", "Unable to recieve data from URL.");
-		fetchedData->deleteLater();
-		fetchedData = 0;
+		contentDownloader->deleteLater();
+		contentDownloader = 0;
 		return;
 	}
+
 	loadedUrls.clear();
 	QString line;
-	while(!fetchedData->atEnd()){
-		line = fetchedData->readLine();
+	while(!contentDownloader->atEnd()){
+		line = contentDownloader->readLine();
 		QRegExp tag("<img");
 		tag.setCaseSensitivity(Qt::CaseInsensitive);
 		QRegExp extension("(http|https)://.+");
@@ -67,10 +68,10 @@ void ImageViewer::finishedFetching() {
 						part = part.mid(1, part.length()-2);
 					QUrl imageURL;
 					if(part.startsWith('/')) { // path relative to domain
-						imageURL = fetchedData->url();
+						imageURL = contentDownloader->url();
 						imageURL.setPath(part);
 					} else if(!extension.exactMatch(part)) {
-						imageURL = fetchedData->url();
+						imageURL = contentDownloader->url();
 						QString cpath = imageURL.path();
 						if(!cpath.endsWith('/'))
 							cpath += '/';
@@ -99,6 +100,6 @@ void ImageViewer::finishedFetching() {
 	if(loadedUrls.length() == 0) {
 		QMessageBox::warning(this, "Warning", "No image sources found on the provided URL.");
 	}
-	fetchedData->deleteLater();
-	fetchedData = 0;
+	contentDownloader->deleteLater();
+	contentDownloader = 0;
 }

@@ -22,7 +22,7 @@ public:
 private:
 	Ui::ImageViewer *ui;
 	QNetworkAccessManager accessManager;
-	QNetworkReply* fetchedData;
+	QNetworkReply* contentDownloader;
 	QStringList loadedUrls;
 	ImageGridLayout* gridLayout;
 

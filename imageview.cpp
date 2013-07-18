@@ -5,7 +5,6 @@
 
 ImageView::ImageView(QNetworkReply* data, QWidget *parent) : QWidget(parent) {
 	imageData = data;
-	connect(data, SIGNAL(finished()), this, SLOT(recievedData()));
 	frameIndex = percent = 0;
 	frameTimer.setSingleShot(true);
 	errored = false;
@@ -14,6 +13,7 @@ ImageView::ImageView(QNetworkReply* data, QWidget *parent) : QWidget(parent) {
 	data->setParent(this);
     _width = width();
     _height = height();
+	connect(data, SIGNAL(finished()), this, SLOT(recievedData()));
 	connect(data, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(progress(qint64,qint64)));
 	connect(data, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(downloadError(QNetworkReply::NetworkError)));
 }

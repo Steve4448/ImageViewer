@@ -52,9 +52,9 @@ void ImageViewer::finishedFetching() {
 	QString line;
 	while(!contentDownloader->atEnd()){
 		line = contentDownloader->readLine();
-		QRegExp tag("<img");
+		QRegExp tag("<img"); //<img[^>]*
 		tag.setCaseSensitivity(Qt::CaseInsensitive);
-		QRegExp extension("(http|https)://.+");
+		QRegExp extension("(http|https)://");
 		extension.setCaseSensitivity(Qt::CaseInsensitive);
 		int pos = line.indexOf(tag), pos2 = line.indexOf(">", pos);
 		while(pos > -1 && pos2 > pos) {
@@ -62,12 +62,13 @@ void ImageViewer::finishedFetching() {
 			QStringList parts = line.mid(pos, pos2 - pos).split(QRegExp("(=|\\s)"), QString::SkipEmptyParts);
 			for(int i = 0; i < parts.length(); i++){
 				QString part = parts[i];
-				if(foundSrc){
-					qDebug() << part;
+				if(foundSrc) {
 					if(part.startsWith('"') || part.startsWith('\''))
 						part = part.mid(1, part.length()-2);
 					QUrl imageURL;
-					if(part.startsWith('/')) { // path relative to domain
+					if(part.startsWith("//")) {
+						imageURL = "http://" + part.remove(0, 2);
+					} else if(part.startsWith('/')) {
 						imageURL = contentDownloader->url();
 						imageURL.setPath(part);
 					} else if(!extension.exactMatch(part)) {
